@@ -5,6 +5,7 @@ sequencer. The port preserves upstream history and adds an offline x86-hosted
 mode with a local GFOpenSynth/AkikoPlus MIDI bridge.
 
 - Port status and bridge contract: [docs/GFOS-PORT.md](docs/GFOS-PORT.md)
+- Port home: [AmigaGFOSPorts/gfopensignal](https://github.com/AmigaGFOSPorts/gfopensignal)
 - Upstream: [ryohey/signal](https://github.com/ryohey/signal)
 - Pinned intake commit: `dc5e0313c1b1fd279c3f65b505f177532bd113ab`
 
