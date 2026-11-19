@@ -1,3 +1,15 @@
+# GFOpenSignal
+
+GFOpenSignal is the GFOS/Cradle port of Signal, a modern MIT-licensed MIDI
+sequencer. The port preserves upstream history and adds an offline x86-hosted
+mode with a local GFOpenSynth/AkikoPlus MIDI bridge.
+
+- Port status and bridge contract: [docs/GFOS-PORT.md](docs/GFOS-PORT.md)
+- Upstream: [ryohey/signal](https://github.com/ryohey/signal)
+- Pinned intake commit: `dc5e0313c1b1fd279c3f65b505f177532bd113ab`
+
+## Upstream README
+
 ![logo-github](https://github.com/ryohey/signal/assets/5355966/46834ee4-30d8-4b66-a47c-6e081cc2c09f)
 
 [![Join the chat at https://discord.gg/XQxzNdDJse](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FXQxzNdDJse%3Fwith_counts%3Dtrue&query=%24.approximate_presence_count&suffix=%20online&style=flat&logo=discord&logoColor=white&label=discord&labelColor=%235865F2&color=%23424549)](https://discord.gg/XQxzNdDJse)

@@ -10,6 +10,7 @@ import {
   type Functions,
   getFunctions,
 } from "firebase/functions"
+import { gfosConfig } from "../config/gfos"
 
 // Drops keys whose value is undefined, so optional config fields stay absent.
 const definedOnly = <T extends object>(obj: T) =>
@@ -27,6 +28,15 @@ const firebaseConfig = definedOnly({
 })
 
 const modules = (() => {
+  if (gfosConfig.enabled) {
+    return {
+      app: null,
+      auth: null,
+      firestore: null,
+      functions: null,
+    }
+  }
+
   try {
     const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)

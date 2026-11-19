@@ -5,6 +5,7 @@ import CloudOutlined from "mdi-react/CloudOutlineIcon"
 import KeyboardArrowDown from "mdi-react/KeyboardArrowDownIcon"
 import { type FC, useCallback, useState } from "react"
 import { hasFSAccess } from "../../actions/file"
+import { gfosConfig } from "../../config/gfos"
 import { useExport } from "../../features/export/hooks/useExport"
 import { useAuth } from "../../hooks/useAuth"
 import { useRootView } from "../../hooks/useRootView"
@@ -48,7 +49,7 @@ export const FileMenuButton: FC = () => {
 
       {user && <CloudFileMenu />}
 
-      {user === null && (
+      {user === null && !gfosConfig.enabled && (
         <>
           <MenuDivider />
           <MenuItem

@@ -2,6 +2,7 @@ import { useProgress } from "dialog-hooks"
 import { type FC, useEffect, useRef, useState } from "react"
 import { useSetSong } from "../../actions"
 import { songFromArrayBuffer } from "../../actions/file"
+import { gfosConfig } from "../../config/gfos"
 import { useLoadSongFromExternalMidiFile } from "../../features/cloud-file/hooks/cloudSong"
 import { useMIDIDevice } from "../../features/midi-device/hooks/useMIDIDevice"
 import { useSoundFont } from "../../features/soundfont/hooks/useSoundFont"
@@ -31,7 +32,9 @@ export const OnInit: FC = () => {
     const closeProgress = showProgress(localized["initializing"])
     try {
       await rootStore.init()
-      await initSoundFont()
+      if (!gfosConfig.enabled) {
+        await initSoundFont()
+      }
       await initMIDIDevice()
     } catch (e) {
       setIsErrorDialogOpen(true)
@@ -105,7 +108,6 @@ export const OnInit: FC = () => {
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
     // StrictMode runs effects twice in development
     if (didInit.current) {
