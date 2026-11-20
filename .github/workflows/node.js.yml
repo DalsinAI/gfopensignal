@@ -8,10 +8,23 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # LumaVault runners poll GitHub from bigguy; no inbound connection is used.
+    # The public repository may receive pull requests from forks. Never run
+    # fork-controlled code on the Team's machine.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, lumavault]
+    timeout-minutes: 30
 
     strategy:
       matrix:
@@ -24,8 +37,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm build:app
+      - run: pnpm build:gfos
+      - run: pnpm test:gfos-bridge
+      - run: GFOS_VERSION=0.1.0-rc1 node scripts/package-gfos.mjs
       - run: pnpm test

@@ -1,6 +1,7 @@
 import { atom, useAtomValue } from "jotai"
 import { useAtomCallback } from "jotai/utils"
 import { useCallback, useEffect, useSyncExternalStore } from "react"
+import { gfosConfig } from "../../../config/gfos"
 import { usePlayer } from "../../../hooks/usePlayer"
 import { useStores } from "../../../hooks/useStores"
 import MIDIDeviceOutput from "../../../services/MIDIDeviceOutput"
@@ -52,10 +53,19 @@ export function useMIDIDevice() {
   }))
 
   const outputDevices: Device[] = [
-    {
-      ...factorySound,
-      isEnabled: isFactorySoundEnabled,
-    },
+    ...(gfosConfig.enabled
+      ? [
+          {
+            ...gfosBridge,
+            isEnabled: enabledOutputs[gfosBridge.id] ?? true,
+          },
+        ]
+      : [
+          {
+            ...factorySound,
+            isEnabled: isFactorySoundEnabled,
+          },
+        ]),
     ...outputs.map((device) => ({
       id: device.id,
       name: formatName(device),
@@ -122,7 +132,7 @@ export function useMIDIDevice() {
     setMidiInputRouting: midiDeviceStore.setMidiInputRouting,
     setOutputEnable: useCallback(
       (deviceId: string, isEnabled: boolean) => {
-        if (deviceId === factorySound.id) {
+        if (!gfosConfig.enabled && deviceId === factorySound.id) {
           midiDeviceStore.isFactorySoundEnabled = isEnabled
         } else {
           midiDeviceStore.setOutputEnable(deviceId, isEnabled)
@@ -140,6 +150,12 @@ const formatName = (device: MIDIPort) =>
 const factorySound = {
   id: "signal-midi-app",
   name: "Signal Factory Sound",
+  isConnected: true,
+}
+
+const gfosBridge = {
+  id: "gfos-synth-bridge",
+  name: "GFOpenSynth / AkikoPlus",
   isConnected: true,
 }
 
@@ -162,7 +178,7 @@ const outputsAtom = atom<readonly MIDIOutput[]>([])
 // sync synthGroup.output to enabledOutputIds/isFactorySoundEnabled
 function useSyncOutputDevices() {
   const { allSoundsOff } = usePlayer()
-  const { midiDeviceStore, synthGroup, synth } = useStores()
+  const { gfosSynth, midiDeviceStore, synthGroup, synth } = useStores()
   const outputs = useAtomValue(outputsAtom)
   const enabledOutputs = useSyncExternalStore(
     midiDeviceStore.onEnabledOutputsChanged.subscribe,
@@ -182,10 +198,19 @@ function useSyncOutputDevices() {
     }))
 
     synthGroup.outputs = [
-      {
-        synth,
-        isEnabled: isFactorySoundEnabled,
-      },
+      ...(gfosConfig.enabled && gfosSynth !== null
+        ? [
+            {
+              synth: gfosSynth,
+              isEnabled: enabledOutputs[gfosBridge.id] ?? true,
+            },
+          ]
+        : [
+            {
+              synth,
+              isEnabled: isFactorySoundEnabled,
+            },
+          ]),
       ...midiDeviceEntries,
     ]
   }, [
@@ -195,5 +220,6 @@ function useSyncOutputDevices() {
     allSoundsOff,
     synthGroup,
     synth,
+    gfosSynth,
   ])
 }

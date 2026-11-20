@@ -41,6 +41,7 @@ esdoc
 pkg
 build
 dist
+release
 
 *.env
 *.provisionprofile

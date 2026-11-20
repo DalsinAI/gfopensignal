@@ -1,5 +1,6 @@
 import { type FC, useMemo } from "react"
 import { Helmet } from "react-helmet-async"
+import { gfosConfig } from "../../config/gfos"
 import { useSong } from "../../hooks/useSong"
 
 export const Head: FC = () => {
@@ -17,7 +18,9 @@ export const Head: FC = () => {
 
   return (
     <Helmet>
-      <title>{`${songName}${isSaved ? "" : " *"} - signal`}</title>
+      <title>{`${songName}${isSaved ? "" : " *"} - ${
+        gfosConfig.enabled ? "GFOpenSignal" : "signal"
+      }`}</title>
     </Helmet>
   )
 }

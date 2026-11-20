@@ -5,9 +5,11 @@ import {
   SongStore,
 } from "@signal-app/core"
 import { Player, SoundFont, SoundFontSynth } from "@signal-app/player"
+import { gfosConfig } from "../config/gfos"
 import { isRunningInElectron } from "../helpers/platform"
 import { EventSource } from "../player/EventSource"
 import { AutoSaveService } from "../services/AutoSaveService"
+import { GFOSSynthOutput } from "../services/GFOSSynthOutput"
 import { GroupOutput } from "../services/GroupOutput"
 import { MIDIMonitor } from "../services/MIDIMonitor"
 import { MIDIRecorder } from "../services/MIDIRecorder"
@@ -19,6 +21,7 @@ export default class RootStore {
   readonly player: Player
   readonly synth: SoundFontSynth
   readonly metronomeSynth: SoundFontSynth
+  readonly gfosSynth: GFOSSynthOutput | null
   readonly synthGroup: GroupOutput
   readonly midiInput: MIDIInput
   readonly midiRecorder: MIDIRecorder
@@ -30,8 +33,14 @@ export default class RootStore {
     const context = new (window.AudioContext || window.webkitAudioContext)()
     this.synth = new SoundFontSynth(context)
     this.metronomeSynth = new SoundFontSynth(context)
-    this.synthGroup = new GroupOutput(this.metronomeSynth)
-    this.synthGroup.outputs.push({ synth: this.synth, isEnabled: true })
+    this.gfosSynth = gfosConfig.enabled
+      ? new GFOSSynthOutput(gfosConfig.synthBridgeUrl)
+      : null
+    this.synthGroup = new GroupOutput(this.gfosSynth ?? this.metronomeSynth)
+    this.synthGroup.outputs.push({
+      synth: this.gfosSynth ?? this.synth,
+      isEnabled: true,
+    })
 
     const eventSource = new EventSource(this.songStore)
     this.player = new Player(this.synthGroup, eventSource)
@@ -57,8 +66,12 @@ export default class RootStore {
   }
 
   async init() {
-    await this.synth.setup()
-    this.setupMetronomeSynth()
+    if (!gfosConfig.enabled) {
+      await this.synth.setup()
+      this.setupMetronomeSynth()
+    } else {
+      this.gfosSynth?.activate()
+    }
     this.autoSaveService.startAutoSave()
     this.bluetoothMIDIDeviceStore.autoConnect()
   }

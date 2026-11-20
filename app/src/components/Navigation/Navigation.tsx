@@ -9,6 +9,7 @@ import React, {
   type MouseEvent,
   useCallback,
 } from "react"
+import { gfosConfig } from "../../config/gfos"
 import { getPlatform, isRunningInElectron } from "../../helpers/platform"
 import { useRootView } from "../../hooks/useRootView"
 import { useRouter } from "../../hooks/useRouter"
@@ -19,6 +20,7 @@ import { envString } from "../../localize/envString"
 import { Localized } from "../../localize/useLocalization"
 import { EditMenuButton } from "./EditMenuButton"
 import { FileMenuButton } from "./FileMenuButton"
+import { GFOSBridgeStatus } from "./GFOSBridgeStatus"
 import { UserButton } from "./UserButton"
 
 const Container = styled.div`
@@ -196,6 +198,8 @@ const _Navigation: FC = () => {
 
       <FlexibleSpacer />
 
+      {gfosConfig.enabled && <GFOSBridgeStatus />}
+
       {!isRunningInElectron() && (
         <>
           <Tab onClick={onClickSettings}>
@@ -212,22 +216,24 @@ const _Navigation: FC = () => {
             </TabTitle>
           </Tab>
 
-          <Tab>
-            <Forum style={IconStyle} />
-            <TabTitle>
-              <a
-                href="https://discord.gg/XQxzNdDJse"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Discord
-              </a>
-            </TabTitle>
-          </Tab>
+          {!gfosConfig.enabled && (
+            <Tab>
+              <Forum style={IconStyle} />
+              <TabTitle>
+                <a
+                  href="https://discord.gg/XQxzNdDJse"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Discord
+                </a>
+              </TabTitle>
+            </Tab>
+          )}
         </>
       )}
 
-      <UserButton />
+      {!gfosConfig.enabled && <UserButton />}
     </Container>
   )
 }
