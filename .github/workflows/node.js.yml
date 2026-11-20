@@ -13,7 +13,7 @@ jobs:
   build:
     # local runner; fork PRs never run on it
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, Linux, X64, amigagfosports]
+    runs-on: [self-hosted, lumavault]
 
     strategy:
       matrix:
