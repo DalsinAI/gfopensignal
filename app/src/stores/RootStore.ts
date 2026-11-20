@@ -69,6 +69,8 @@ export default class RootStore {
     if (!gfosConfig.enabled) {
       await this.synth.setup()
       this.setupMetronomeSynth()
+    } else {
+      this.gfosSynth?.activate()
     }
     this.autoSaveService.startAutoSave()
     this.bluetoothMIDIDeviceStore.autoConnect()

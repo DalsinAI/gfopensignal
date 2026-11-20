@@ -41,4 +41,6 @@ jobs:
       - run: pnpm lint
       - run: pnpm build:app
       - run: pnpm build:gfos
+      - run: pnpm test:gfos-bridge
+      - run: GFOS_VERSION=0.1.0-rc1 node scripts/package-gfos.mjs
       - run: pnpm test

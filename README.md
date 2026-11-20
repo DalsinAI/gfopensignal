@@ -9,6 +9,10 @@ mode with a local GFOpenSynth/AkikoPlus MIDI bridge.
 - Upstream: [ryohey/signal](https://github.com/ryohey/signal)
 - Pinned intake commit: `dc5e0313c1b1fd279c3f65b505f177532bd113ab`
 
+The RC package starts the editor and its local MIDI bridge with
+`./GFOpenSignal`. Point the selected AkikoPlus/GFOpenSynth host at the bridge
+with `AC_AKIKO_MIDI_UDP=4712`.
+
 ## Upstream README
 
 ![logo-github](https://github.com/ryohey/signal/assets/5355966/46834ee4-30d8-4b66-a47c-6e081cc2c09f)

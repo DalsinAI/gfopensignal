@@ -7,6 +7,8 @@ const MAX_QUEUED_MESSAGES = 512
 
 type SocketFactory = (url: string) => WebSocket
 
+export type GFOSBridgeStatus = "disconnected" | "connecting" | "connected"
+
 type BridgeMidiMessage = {
   protocol: "gfos-midi/1"
   type: "midi"
@@ -26,6 +28,8 @@ type BridgeMidiMessage = {
 export class GFOSSynthOutput implements SynthOutput {
   private socket: WebSocket | null = null
   private readonly queuedMessages: string[] = []
+  private status: GFOSBridgeStatus = "disconnected"
+  private readonly statusListeners = new Set<() => void>()
 
   constructor(
     private readonly url: string,
@@ -42,6 +46,7 @@ export class GFOSSynthOutput implements SynthOutput {
 
     const socket = this.socketFactory(this.url)
     this.socket = socket
+    this.setStatus("connecting")
 
     socket.onopen = () => {
       if (this.socket !== socket) {
@@ -54,18 +59,30 @@ export class GFOSSynthOutput implements SynthOutput {
           client: "GFOpenSignal",
         }),
       )
+      this.setStatus("connected")
       this.flushQueue(socket)
     }
 
     socket.onclose = () => {
       if (this.socket === socket) {
         this.socket = null
+        this.setStatus("disconnected")
       }
     }
     socket.onerror = () => {
       // A later MIDI event retries the connection. The browser reports the
       // transport error itself; no network service is required for editing.
+      if (this.socket === socket) {
+        this.setStatus("disconnected")
+      }
     }
+  }
+
+  getStatus = (): GFOSBridgeStatus => this.status
+
+  subscribeStatus = (listener: () => void) => {
+    this.statusListeners.add(listener)
+    return () => this.statusListeners.delete(listener)
   }
 
   sendEvent(
@@ -106,6 +123,16 @@ export class GFOSSynthOutput implements SynthOutput {
       if (message !== undefined) {
         socket.send(message)
       }
+    }
+  }
+
+  private setStatus(status: GFOSBridgeStatus) {
+    if (this.status === status) {
+      return
+    }
+    this.status = status
+    for (const listener of this.statusListeners) {
+      listener()
     }
   }
 }

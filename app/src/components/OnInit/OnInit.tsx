@@ -34,8 +34,8 @@ export const OnInit: FC = () => {
       await rootStore.init()
       if (!gfosConfig.enabled) {
         await initSoundFont()
+        await initMIDIDevice()
       }
-      await initMIDIDevice()
     } catch (e) {
       setIsErrorDialogOpen(true)
       setErrorMessage((e as Error).message)
