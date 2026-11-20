@@ -19,10 +19,11 @@ permissions:
 
 jobs:
   build:
+    # LumaVault runners poll GitHub from bigguy; no inbound connection is used.
     # The public repository may receive pull requests from forks. Never run
     # fork-controlled code on the Team's machine.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, amicradle-validate]
+    runs-on: [self-hosted, lumavault]
     timeout-minutes: 30
 
     strategy:
